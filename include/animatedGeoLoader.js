@@ -5,17 +5,6 @@ function animatedGeoLoader(){
 	var AnimSimple = new THREE.JSONLoader();
 	AnimSimple.load( '../Data/wizard/Wizard.js',function (geometry, materials){
 				
-
-		/*for ( var i = 0; i < geometry.animation.hierarchy.length; i ++ ) {
-			var bone = geometry.animation.hierarchy[ i ];
-
-			var first = bone.keys[ 0 ];
-			var last = bone.keys[ bone.keys.length - 1 ];
-
-			last.pos = first.pos;
-			last.rot = first.rot;
-			last.scl = first.scl;
-		}*/
 				
 		geometry.computeBoundingBox();
 		var bb = geometry.boundingBox;
@@ -31,19 +20,17 @@ function animatedGeoLoader(){
 
 			m.color.setHSL( 0, 255, 0.6 );
 
-			//m.map = map;
-			m.envMap = reflectionCube;
-			//m.bumpMap = bumpMap;
-			//m.bumpScale = 2;
-			//m.combine = THREE.MixOperation;
-			m.reflectivity = 0.45;
 		};
 
 					
 		// Define the materials for our mesh
 		mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
-			color : 0x00ff55,
 			skinning : true,
+			map: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Col.png" ),
+			specularMap:  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Spec.png"),
+			normalMap:    new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Nrml.png" ),
+			reflectivity: new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Gloss.png"),
+			aoMap: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Ao.png"),		
 			emissive: 0x000000,
 			envMap : reflectionCube,
 			reflectivity: 0.45		
