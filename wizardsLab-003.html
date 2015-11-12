@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Wizards Laboratory</title>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximumscale=1.0">
+<style>
+
+	body {
+		color: #000000;
+		font-family: Monospace;
+		font-size:13px;
+		text-align:center;
+		
+		background-color:#ffffff;
+		margin: 0px;
+		overflow:hidden;
+	}
+
+</style>
+</head>
+<body>
+	<div id="WebGLContainer"></div>
+    
+    <script src="js/three.min.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/ShaderGodRays.js"></script>
+    <script src="js/controls/TrackballControls.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+    
+    <script src="include/initialize.js"></script>
+    <script src="include/LightSetup.js"></script>
+    <script src="include/geoLoad.js"></script>
+    <script src="include/animatedGeoLoader.js"></script>
+    
+    <script src="include/postPro.js"></script>
+
+	<script src="include/onMouseMove.js"></script>
+    <script src="include/onMouseDown.js"></script>
+    <script src="include/onMouseUp.js"></script>
+    <script src="include/onWindowResize.js"></script>
+    
+    <script>
+        var SCREEN_WIDTH  = (window.innerWidth  / 2 ) - ( window.innerWidth / 10 );
+        var SCREEN_HEIGHT = window.innerHeight - (window.innerHeight / 10);
+		var FLOOR = 0;
+		
+		var container, stats;
+		
+		var camera, controls, scene, renderer, materialDepth;
+		var raycaster = new THREE.Raycaster();
+		
+		var sunPosition = new THREE.Vector3(600, 900, 400);
+		var screenSpacePosition = new THREE.Vector3();
+
+		var mesh, helper;
+		var mixer;
+		var objects = [], plane;
+
+		var bookover = false;
+		var animated = true;
+		var animSimple;
+		
+		// the density of the shadow map 
+		var shadMap = 2048;
+		var reflectionCube;
+		
+		var dustSystem;
+		
+		var mouse = new THREE.Vector2(),
+			offset = new THREE.Vector3(),
+			INTERSECTED, SELECTED;
+		var offset = new THREE.Vector3(10,10,10);
+		
+		var windowHalfX = SCREEN_WIDTH  / 2;
+		var windowHalfY = SCREEN_HEIGHT / 2;
+		
+		var clock = new THREE.Clock();
+		
+		
+		var post = {enabled : false };
+		
+		var bgColor = 0x000000;
+		var sunColor = 0x00eeff;
+		var fogIntensity = 0.45;		
+		
+		initialize();
+		animate();
+		
+		
+		function initGUI(){
+		
+			var API = {
+				'show model'    : true,
+				'show skeleton' : false	
+			};
+			
+			var gui = new dat.GUI()
+			
+			gui.add( API, 'show model').onChange(function(){mesh.visible = API['show model'];});
+			gui.add( API, 'show skeleton').onChange( function(){helper.visible = API['show skeleton'];});
+			
+		}
+		
+		function animate(){
+			requestAnimationFrame( animate );
+
+			render();	
+			stats.update();
+		}
+		
+		function render(){
+
+			var delta = 0.75 * clock.getDelta();
+
+			controls.update();		
+
+			//dustSystem Animation
+			dustSystem.rotation.x += delta * Math.sin(0.05);			
+			dustSystem.rotation.y += delta * Math.sin(0.05);
+			dustSystem.rotation.z += delta * 0.05;		
+			
+			if( animated == true ){
+				// update skinning
+				THREE.AnimationHandler.update( delta );
+
+				if ( helper !== undefined ) helper.update();
+			}
+			if ( post.enabled){
+				
+				renderPost();
+					
+			}else{
+				renderer.clear();
+				renderer.render( scene, camera );	
+			}
+		}
+	
+	</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Wizards Laboratory</title>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximumscale=1.0">
+<style>
+
+	body {
+		color: #000000;
+		font-family: Monospace;
+		font-size:13px;
+		text-align:center;
+		
+		background-color:#ffffff;
+		margin: 0px;
+		overflow:hidden;
+	}
+
+</style>
+</head>
+<body>
+	<div id="WebGLContainer"></div>
+    
+    <script src="js/three.min.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/controls/TrackballControls.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+    
+    <script src="LightSetup.js"></script>
+    <script src="geoLoad.js"></script>
+    
+    <script>
+        var SCREEN_WIDTH  = (window.innerWidth  / 2 ) - ( window.innerWidth / 10 );
+        var SCREEN_HEIGHT = window.innerHeight - (window.innerHeight / 10);
+		var FLOOR = 0;
+		
+		var container, stats;
+		
+		var camera, controls, scene, renderer;
+		
+		var mesh, helper;
+		var mixer;
+		
+		// the density of the shadow map 
+		var shadMap = 1024;
+		var reflectionCube;
+		
+		var mouse = new THREE.Vector2();
+		var offset = new THREE.Vector3(10,10,10);
+		
+		var windowHalfX = SCREEN_WIDTH  / 2;
+		var windowHalfY = SCREEN_HEIGHT / 2;
+		
+		var clock = new THREE.Clock();
+		
+		init();
+		animate();
+		
+		function init(){
+			container = document.getElementById('WebGLContainer');
+			
+			// camera setup
+			camera = new THREE.PerspectiveCamera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+			camera.position.x = 300;
+			camera.position.z = 200;
+			camera.position.y = 250;
+
+			//control setup
+			controls = new THREE.TrackballControls(camera);
+			controls.rotateSpeed = 20.0;
+			controls.zoomSpeed   = 10.2;
+			controls.panSpeed    = 0.8;
+			controls.noZoom = false;
+			controls.noPan  = false;
+			controls.staticMoving = true;
+			controls.dynamicDampingFactor = 0.3;
+
+			//scene setup
+			scene = new THREE.Scene();	
+			//scene.fog = new THREE.Fog( 0x33CCFF, 80, 50000);
+			scene.add(camera)
+			
+			// Light Setup
+			//console.log("calling LightSetup()")
+			LightSetup(shadMap);		
+			
+			
+			// Renderer Setup
+			renderer = new THREE.WebGLRenderer({antialias:true});
+			//renderer.setClearColor(scene.fog.color);
+			renderer.setPixelRatio(window.devicePixelRation);
+			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+			renderer.domElement.style.position = "relative";
+			
+			renderer.gammaInput  = true;
+			renderer.gammaOutput = true;
+			renderer.sortObjects = false;
+			
+			container.appendChild( renderer.domElement );
+			
+			renderer.shadowMap.enabled = true;
+			renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+			
+			// STATS
+			stats = new Stats();
+			container.appendChild(stats.domElement);
+			
+			//create Environment Cube
+			var path = "Data/cube/Castle/";
+			var format = '.jpg';
+			var urls = [
+					path + 'px.jpg', path + 'nx.jpg',
+					path + 'py.jpg', path + 'ny.jpg',
+					path + 'pz.jpg', path + 'nz.jpg' 
+				];
+			
+			reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+			reflectionCube.format = THREE.RGBFormat;			
+			
+			// Loading Geometries
+			// load spellbook
+			//console.log("calling geoLoad() for the spellbook");
+			geoLoad( 'Data/spellbook/spellbook.js', "spellbook/spellbook", [0, 68, 0], [0, 0, 0.7], true);
+			
+			// load bookStand
+			//console.log("calling geoLoad() for the book stand");
+			geoLoad('Data/bookstand/bookStand.json', "bookstand/bookStand", [ 0, 0, 0 ], [ 0, 0, 0 ], true);						
+
+			
+			// Alembic Stand
+			//console.log("calling geoLoad() for the Alembic stand");
+			geoLoad('Data/AStand/AStand.json', "AStand/AStand", [ 0, 0, 0 ], [ 0, 0, 0 ], true);		
+
+			// Alembic Stand
+			//console.log("calling geoLoad() for the Alembic stand");
+			geoLoad('Data/LabTable/LabTable.json', "LabTable/LabTable", [ 0, 0, 0 ], [ 0, 0, 0 ], true);
+
+			// LabFloor
+			//console.log("calling geoLoad() for the Alembic stand");
+			geoLoad('Data/LabFloor/LabFloor.json', "LabFloor/LabFloor", [ 0, 0, 0 ], [ 0, 0, 0 ], true);			
+
+			//Lab equipment
+			var Alembic = new THREE.JSONLoader();
+			
+			Alembic.load( 'Data/Alembic.json',function (geometry, materials){
+				
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+				
+				var cubeMaterial = new THREE.MeshPhongMaterial({  color : 0x007788, 
+   																  envMap: reflectionCube,
+																  transparent : true,
+																  shininess: 100,
+																  opacity : 0.3,
+																  refractionRatio: 0.95 });
+				
+				// Define the materials for our mesh
+				mesh = new THREE.SkinnedMesh( geometry, cubeMaterial );
+				
+				mesh.position.set( 0, 0, 0);
+				mesh.scale.set( 20, 20, 20 );
+				scene.add(mesh);
+			
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;	
+			
+			});
+			
+
+			var APotion = new THREE.JSONLoader();
+									
+			APotion.load( 'Data/APotion/APotion.json',function (geometry, materials){
+				
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+					
+				
+				var cubeMaterial = new THREE.MeshBasicMaterial({ color : 0xDD2200, 
+   																  envMap: reflectionCube,
+																  transparent : true,
+																  opacity : 0.8,
+																  refractionRatio: 0.95 });
+				
+				// Define the materials for our mesh
+				mesh = new THREE.SkinnedMesh( geometry, cubeMaterial );
+				
+				mesh.position.set( 0, 0, 0);
+				mesh.scale.set( 20, 20, 20 );
+				scene.add(mesh);
+			
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;	
+			
+			});
+			
+			// load Lab Walls		
+			var labWall = new THREE.JSONLoader();
+			
+			labWall.load( 'Data/LabWall.json',function (geometry, materials){
+				
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+					
+				// Define the materials for our mesh
+				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
+				
+						color: 0x222222
+						
+					}));//new THREE.MeshFaceMaterial( materials ));
+				mesh.position.set( 0, 0, 0);
+				mesh.scale.set( 20, 20, 20 );
+				scene.add(mesh);
+			
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;	
+			
+			});
+
+			// load Lab Beams		
+			var labBeams = new THREE.JSONLoader();
+			
+			labBeams.load( 'Data/labBeams.js',function (geometry, materials){
+				
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+					
+				// Define the materials for our mesh
+				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
+				
+						color: 0x222222
+						
+					}));//new THREE.MeshFaceMaterial( materials ));
+				mesh.position.set( 0, 0, 0);
+				mesh.scale.set( 20, 20, 20 );
+				scene.add(mesh);
+			
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;				
+							
+
+			});	
+
+			// load Lab Beams		
+			var labXbeams = new THREE.JSONLoader();
+			
+			labXbeams.load( 'Data/labXbeams.js',function (geometry, materials){
+				
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+					
+				// Define the materials for our mesh
+				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
+				
+						color: 0x222222
+						
+					}));//new THREE.MeshFaceMaterial( materials ));
+				mesh.position.set( 0, 0, 0);
+				mesh.scale.set( 20, 20, 20 );
+				scene.add(mesh);
+			
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;				
+							
+
+			});	
+				
+				
+			//Animated Models
+			//AnimSimple		
+			var AnimSimple = new THREE.JSONLoader();
+			
+			AnimSimple.load( 'Data/AnimSimple.json',function (geometry, materials){
+				
+				for ( var i = 0; i < geometry.animation.hierarchy.length; i ++ ) {
+
+					var bone = geometry.animation.hierarchy[ i ];
+
+					var first = bone.keys[ 0 ];
+					var last = bone.keys[ bone.keys.length - 1 ];
+
+					last.pos = first.pos;
+					last.rot = first.rot;
+					last.scl = first.scl;
+				}
+				
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+					
+				// Define the materials for our mesh
+				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
+				
+						color: 0x22DD22
+						
+					}));
+				mesh.position.set( 45, 0, 45);
+				mesh.scale.set( 20, 20, 20 );
+				scene.add(mesh);
+				animation(mesh);
+			
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;	
+				
+				helper = new THREE.SkeletonHelper( mesh );
+				helper.material.linewidth = 3;
+				helper.visible = false;
+				scene.add( helper );
+
+				var animation = new THREE.Animation( mesh, geometry.animation );
+				animation.play();							
+							
+
+			});								
+						
+			// GUI
+			
+			//initGUI();
+			
+			// window Resize
+			window.addEventListener( 'resize', onWindowResize, false);
+				
+		}
+	
+		
+		function onWindowResize(){
+			// all of this needs to be updated to screen width and height or it will break wordpress	
+			
+			
+			windowHalfX = window.innerWidth / 2;
+			windowHalfY = window.innerHeight / 2;
+			
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			
+			renderer.setSize(window.innerWidth, window.innerHeight );
+		}
+		
+		function initGUI(){
+		
+			var API = {
+				'show model'    : true,
+				'show skeleton' : false	
+			};
+			
+			var gui = new dat.GUI()
+			
+			gui.add( API, 'show model').onChange(function(){mesh.visible = API['show model'];});
+			gui.add( API, 'show skeleton').onChange( function(){helper.visible = API['show skeleton'];});
+			
+		}
+		
+		function onMouseMove(e){
+			mouse.x = e.clientX;
+			mouse.y = e.clientY;	
+		}
+		
+		function animate(){
+			requestAnimationFrame( animate );
+
+			render();	
+			stats.update();
+		}
+		
+		function render(){
+			
+			var delta = 0.75 * clock.getDelta();
+			
+			controls.update();
+			
+			// update skinning
+
+			THREE.AnimationHandler.update( delta );
+			if ( helper !== undefined ) helper.update();
+			
+			renderer.render(scene, camera);
+		}
+	
+	</script>
+</body>
+</html>
