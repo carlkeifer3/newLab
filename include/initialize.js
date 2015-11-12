@@ -121,6 +121,11 @@ function initialize(){
 	// Laboratory Beams
 	//console.log("calling geoLoad() for the lab beams");
 	geoLoad('../Data/labBeams/labBeams.js', "labBeams/labBeams", [0,0,0], [0,0,0], true);
+	
+	
+	// Laboratory Beams
+	//console.log("calling geoLoad() for the lab beams");
+	geoLoad('../Data/labXbeams/labXbeams.js', "labXbeams/labBeams", [0,0,0], [0,0,0], true);
 
 	// Wizard-static
 	//console.log("calling geoLoad() for the static wizard");
@@ -182,29 +187,6 @@ function initialize(){
 		mesh.receiveShadow = true;	
 			
 	});
-
-	// load Lab Beams		
-	var labXbeams = new THREE.JSONLoader();
-			
-	labXbeams.load( '../Data/labXbeams.js',function (geometry, materials){
-			
-		geometry.computeBoundingBox();
-		var bb = geometry.boundingBox;
-					
-		// Define the materials for our mesh
-		mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
-		
-				color: 0x222222
-				
-			}));//new THREE.MeshFaceMaterial( materials ));
-		mesh.position.set( 0, 0, 0);
-		mesh.scale.set( 20, 20, 20 );
-		scene.add(mesh);
-			
-		mesh.castShadow = true;
-		mesh.receiveShadow = true;				
-							
-	});			
 	
 	// load Lab Roof		
 	var labRoof = new THREE.JSONLoader();
