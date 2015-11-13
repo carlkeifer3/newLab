@@ -125,7 +125,7 @@ function initialize(){
 	
 	// Laboratory Beams
 	//console.log("calling geoLoad() for the lab beams");
-	geoLoad('../Data/labXBeams/labXbeams.js', "labXbeams/labBeams", [0,0,0], [0,0,0], true);
+	geoLoad('../Data/labXBeams/labXbeams.js', "labXBeams/labBeams", [0,0,0], [0,0,0], true);
 
 	// Wizard-static
 	//console.log("calling geoLoad() for the static wizard");
