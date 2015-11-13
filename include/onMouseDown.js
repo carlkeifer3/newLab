@@ -1,6 +1,6 @@
 // onDocumentMouseDown
 function onMouseDown( event ){
-	console.log("onMouseDown() called");	
+	//console.log("onMouseDown() called");	
 	if( bookover == true){
 		if ( animated == true){
 			console.log("animation off");
