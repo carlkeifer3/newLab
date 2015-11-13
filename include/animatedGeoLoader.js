@@ -3,7 +3,7 @@ function animatedGeoLoader(){
 	//Animated Models
 	//AnimSimple		
 	var AnimSimple = new THREE.JSONLoader();
-	AnimSimple.load( '../Data/wizard/Wizard.js',function (geometry, materials){
+	AnimSimple.load( '../Data/wizard/wizard.js',function (geometry, materials){
 				
 				
 		geometry.computeBoundingBox();
@@ -30,7 +30,7 @@ function animatedGeoLoader(){
 			specularMap:  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Spec.png"),
 			normalMap:    new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Nrml.png" ),
 			reflectivity: new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Gloss.png"),
-			aoMap: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Ao.png"),		
+			aoMap: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-AO.png"),		
 			emissive: 0x000000,
 			envMap : reflectionCube,
 			reflectivity: 0.45		
