@@ -210,6 +210,8 @@ function initialize(){
 		mesh.receiveShadow = true;				
 							
 	});						
+	
+	console.log("all geometries loaded")
 		
 	animatedGeoLoader();
 

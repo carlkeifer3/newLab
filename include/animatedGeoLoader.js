@@ -26,11 +26,11 @@ function animatedGeoLoader(){
 		// Define the materials for our mesh
 		mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshPhongMaterial({
 			skinning : true,
-			map: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Col.png" ),
-			specularMap:  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Spec.png"),
-			normalMap:    new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Nrml.png" ),
-			reflectivity: new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Gloss.png"),
-			aoMap: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-AO.png"),		
+			map: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Col.PNG" ),
+			specularMap:  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Spec.PNG"),
+			normalMap:    new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Nrml.PNG" ),
+			reflectivity: new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-Gloss.PNG"),
+			aoMap: 		  new THREE.ImageUtils.loadTexture( "../Data/wizard/Wizard-AO.PNG"),		
 			emissive: 0x000000,
 			envMap : reflectionCube,
 			reflectivity: 0.45		

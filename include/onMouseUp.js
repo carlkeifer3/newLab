@@ -1,6 +1,6 @@
 // onDocumentMouseUp
 function onMouseUp( event ){
-	console.log('onMouseUp() called');
+	//console.log('onMouseUp() called');
 	
 	event.preventDefault();
 	controls.enabled = true;

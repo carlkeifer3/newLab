@@ -35,5 +35,5 @@ function geoLoad(fileLoc, material, pos, rot, shadow){
 		mesh.receiveShadow = shadow;				
 	});
 	
-	console.log("--geoLoad() finished");
+	//console.log("--geoLoad() finished");
 }
