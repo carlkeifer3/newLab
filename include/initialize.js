@@ -125,7 +125,7 @@ function initialize(){
 	
 	// Laboratory Beams
 	//console.log("calling geoLoad() for the lab beams");
-	geoLoad('../Data/labXbeams/labXbeams.js', "labXbeams/labBeams", [0,0,0], [0,0,0], true);
+	geoLoad('../Data/labXBeams/labXbeams.js', "labXbeams/labBeams", [0,0,0], [0,0,0], true);
 
 	// Wizard-static
 	//console.log("calling geoLoad() for the static wizard");
@@ -191,7 +191,7 @@ function initialize(){
 	// load Lab Roof		
 	var labRoof = new THREE.JSONLoader();
 			
-	labRoof.load( '../Data/labRoof.js',function (geometry, materials){
+	labRoof.load( '../Data/LabRoof.js',function (geometry, materials){
 			
 		geometry.computeBoundingBox();
 		var bb = geometry.boundingBox;
@@ -228,12 +228,12 @@ function initialize(){
 		particles.vertices.push(particle);
 	}
 	
-	var dustMaterial = new THREE.ParticleBasicMaterial({ color: 0xEEEEEE, 
-														 transparent: true, 
-														 blending: THREE.AdditiveBlending,
-														 size: 2 });
+	var dustMaterial = new THREE.PointsMaterial({ color: 0xEEEEEE, 
+												 opacity: true, 
+												 blending: THREE.AdditiveBlending,
+												 size: 2 });
 	
-	dustSystem = new THREE.ParticleSystem(particles, dustMaterial);
+	dustSystem = new THREE.Points(particles, dustMaterial);
 	scene.add(dustSystem);
 	
 	// GUI
